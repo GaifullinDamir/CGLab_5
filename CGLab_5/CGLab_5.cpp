@@ -182,9 +182,15 @@
 //	glutMainLoop();
 //}
 
+GLfloat myAmbient[] = { 0.10588, 0.058824, 0.113725, 1 };
+GLfloat myDiffuse[] = { 0.427451, 0.470588, 0.541176, 1 };
+GLfloat mySpecular[] = { 0.3333, 0.3333, 0.521569, 1 };
+GLfloat myShininess[] = { 9.84615 };
+
 GLfloat ratio = 4.0 / 3.0;
-GLfloat angle = 0.0;
+GLfloat angle = 0.0, plusangle = 0.0;
 AUX_RGBImageRec* image1, * image2, * image3, * image4;
+int ch1 = 0, ch2 = 0;
 void init()
 {
 	glClearColor(1.0, 1.0, 1.0, 0.0);
@@ -193,53 +199,117 @@ void init()
 	gluPerspective(60, 1, 1, 10);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(3.0, 3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	gluLookAt(2.0, 2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
-	image1 = auxDIBImageLoadA("texture1.bmp");
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image1->sizeX, image1->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_DEPTH_TEST);
+	
 }
 void reshape(int width, int height)
 {
 	if (ratio > width / height) glViewport(0, 0, width, width / ratio);
 	else glViewport(0, 0, height * ratio, height);
 }
+
+
 void display()
 {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	glRotatef(angle, 0.0, 1.0, 0.0);
-	glBegin(GL_TRIANGLES);
-	// грань 0
-	glTexCoord2f(0, 0); glVertex3f(1, 0, 0);
-	glTexCoord2f(0, 1); glVertex3f(0, 1, 0);
-	glTexCoord2f(1, 0); glVertex3f(0, 0, 1);
-	// грань 1
+
+	image1 = auxDIBImageLoadA("texture1.bmp");
+	image2 = auxDIBImageLoadA("texture2.bmp");
+	image3 = auxDIBImageLoadA("texture1.bmp");
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image2->sizeX, image2->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image2->data);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
+
+	GLfloat myLightPosition[] = { 1.0, 2.0, 2.0, 1.0 }; // Источник света в CKw
+	glLightfv(GL_LIGHT0, GL_POSITION, myLightPosition); /*Позиция источника света будет преобразована в CKe*/
+	glLightfv(GL_LIGHT0, GL_AMBIENT, myAmbient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, myDiffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, mySpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, myShininess);
+
+	glEnable(GL_LIGHTING); // Включение расчета освещенности
+	glEnable(GL_LIGHT0); // включаем этот конкретный источник
+
+	glPushMatrix();	
+
+	glLightfv(GL_LIGHT0, GL_POSITION, myLightPosition);
+	glPopMatrix(); // Восстанавливаем VM=Fwe
+	// грань dawn
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image1->sizeX, image1->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
+	glBegin(GL_POLYGON);
+	glNormal3f(0, -1, 0); 
 	glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
-	glTexCoord2f(0, 1); glVertex3f(0, 1, 0);
-	glTexCoord2f(1, 0); glVertex3f(1, 0, 0);
-	// грань 2
-	glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
-	glTexCoord2f(1, 0); glVertex3f(0, 0, 1);
-	glTexCoord2f(0, 1); glVertex3f(0, 1, 0);
-	// грань 3
-	glTexCoord2f(0, 0); glVertex3f(1, 0, 0);
-	glTexCoord2f(0, 1); glVertex3f(0, 0, 1);
-	glTexCoord2f(1, 0); glVertex3f(0, 0, 0);
+	glTexCoord2f(0, 1); glVertex3f(1, 0, 0);
+	glTexCoord2f(1, 0); glVertex3f(1, 0, 1);
+	glTexCoord2f(1, 1); glVertex3f(0, 0, 1);
 	glEnd();
+	//грань f1
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image2->sizeX, image2->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image2->data);
+	glBegin(GL_POLYGON);
+	glNormal3f(0, 0.707, -0.707); 
+	glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
+	glTexCoord2f(0, 1); glVertex3f(0, 0, 1);
+	glTexCoord2f(1, 0); glVertex3f(0.5, 0.5, 0.5);
+	glEnd();
+	//грань f2
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image2->sizeX, image2->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image2->data);
+	glBegin(GL_POLYGON);
+	glNormal3f(-0.707, 0.707, 0);
+	glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
+	glTexCoord2f(0, 1); glVertex3f(1, 0, 0);
+	glTexCoord2f(1, 0); glVertex3f(0.5, 0.5, 0.5);
+	glEnd();
+	//// грань f3
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image3->sizeX, image3->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image3->data);
+	glBegin(GL_POLYGON);
+	glNormal3f(0.707, 0.707, 0);
+	glTexCoord2f(0, 0); glVertex3f(1, 0, 0);
+	glTexCoord2f(0, 1); glVertex3f(1, 0, 1);
+	glTexCoord2f(1, 0); glVertex3f(0.5, 0.5, 0.5);
+	glEnd();
+	//// грань f4
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image3->sizeX, image3->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image3->data);
+	glBegin(GL_POLYGON);
+	glNormal3f(0, 0.707, 0.707);
+	glTexCoord2f(0, 0); glVertex3f(1, 0, 1);
+	glTexCoord2f(0, 1); glVertex3f(0, 0, 1);
+	glTexCoord2f(1, 0); glVertex3f(0.5, 0.5, 0.5);
+	glEnd();
+
+	glPopMatrix(); // Восстанавливаем VM=Fwe
+	glDisable(GL_LIGHTING); //Выключаем освещение
+
+	glBegin(GL_LINES); //Рисуем координатные оси разного цвета в CKe
+	glColor3f(1, 0, 0); glVertex3f(0, 0, 0); glVertex3f(2, 0, 0);
+	glColor3f(0, 1, 0); glVertex3f(0, 0, 0); glVertex3f(0, 2, 0);
+	glColor3f(0, 0, 1); glVertex3f(0, 0, 0); glVertex3f(0, 0, 2);
+	glEnd();
+
 	glPopMatrix();
 	glFlush();
 	glutSwapBuffers();
 }
-void idle()
+
+void myIdle()
 {
-	angle += 0.5f;
-	if (angle > 360.0) angle = 0.0;
+	angle += plusangle; if (angle > 360.0) angle = 0;
 	glutPostRedisplay();
 }
+
+void keys(unsigned char key, int x, int y)
+{
+	if (key == '0') {
+		if (ch1 % 2 == 0) plusangle = 2;
+		else plusangle = 0;
+		ch1++;
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
@@ -248,9 +318,10 @@ int main(int argc, char* argv[])
 	glutInitWindowSize(640, 480);
 	glutCreateWindow("Пример текстурирования");
 	glutDisplayFunc(display);
+	glutKeyboardFunc(keys);
 	glutReshapeFunc(reshape);
-	glutIdleFunc(idle);
+	glutIdleFunc(myIdle);
 	init();
 	glutMainLoop();
-	return 0;
+
 }

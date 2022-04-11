@@ -1,0 +1,6 @@
+﻿Сборка начата…
+1>------ Сборка начата: проект: GLLab_5Remastered, Конфигурация: Debug Win32 ------
+1>GLLab_5Remastered.cpp
+1>LINK : fatal error LNK1168: не удается открыть C:\Users\Damir\source\repos\GLLab_5Remastered\Debug\GLLab_5Remastered.exe для записи
+1>Сборка проекта "GLLab_5Remastered.vcxproj" завершена с ошибкой.
+========== Сборка: успешно: 0, с ошибками: 1, без изменений: 0, пропущено: 0 ==========
